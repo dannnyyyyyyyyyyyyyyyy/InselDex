@@ -1,0 +1,2276 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InselDex</title>
+    <meta name="theme-color" content="#eef4e2">
+    <link rel="manifest" href="manifest.json">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #eef4e2;
+    color: #26352b;
+    background-image: url("blatt-muster-dezent.png");
+    background-repeat: repeat;
+    background-size: 180px 180px;
+    background-position: 0 0;
+}
+
+header {
+    background: transparent;
+    padding: 28px 20px 24px;
+    text-align: center;
+}
+
+header img {
+    display: block;
+    width: min(680px, 90%);
+    height: auto;
+    margin: 0 auto;
+}
+
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 25px;
+}
+
+
+.months {
+    display: grid;
+    grid-template-columns: repeat(13, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 25px;
+}
+
+.month {
+    padding: 13px 6px;
+    min-height: 42px;
+    min-width: 0;
+    width: 100%;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 11px;
+    background: white;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.month:hover {
+    background: #e5f0e3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.09);
+}
+
+.month.active {
+    background: #78a878;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.month-info {
+    background: #f3f7f1;
+    min-height: 52px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    margin: 8px 0 10px;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.time-season { margin-bottom: 10px; }
+.time-season:last-child { margin-bottom: 0; }
+.season-month { font-size: 14px; font-weight: bold; color: #26352b; margin-bottom: 3px; }
+.season-time { font-size: 14px; font-weight: bold; color: #26352b; padding-left: 2px; }
+.month-range { white-space: nowrap; }
+
+.categories {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.category {
+    width: 100%;
+    min-height: 56px;
+    padding: 9px 10px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.45);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.07);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.category img {
+    width: 42px;
+    height: 42px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.category span { display: inline-block; line-height: 1; }
+
+.category:nth-child(1) { background: #f0f2ee; color: #465247; }
+.category:nth-child(2) { background: #dceff6; color: #356477; }
+.category:nth-child(3) { background: #e4f1dc; color: #4d7048; }
+.category:nth-child(4) { background: #e6def3; color: #66527d; }
+.category:nth-child(5) { background: #f1dfed; color: #76566e; }
+
+.category:hover {
+    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 7px 16px rgba(0, 0, 0, 0.12);
+}
+
+.category.active {
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.16), inset 0 -2px 0 rgba(0, 0, 0, 0.08);
+}
+
+.category:nth-child(1).active { background: #657565; }
+.category:nth-child(2).active { background: #5793aa; }
+.category:nth-child(3).active { background: #66945e; }
+.category:nth-child(4).active { background: #8068a0; }
+.category:nth-child(5).active { background: #a66d98; }
+
+.filters {
+    width: 100%;
+    margin-bottom: 25px;
+    padding: 16px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    background: #e8ece6;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 16px;
+}
+
+#kunstFilterBereich { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+#kunstFilterBereich .filter,
+#filterBereich .filter { width: 100%; min-width: 0; }
+
+.filter label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.filter input,
+.filter select {
+    width: 100%;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #ccd8cc;
+    border-radius: 7px;
+    background: white;
+}
+
+.progress-box {
+    margin-top: -60px;
+    margin-bottom: 25px;
+    padding: 10px 0 0;
+    background: transparent;
+}
+
+
+.progress-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.progress-item {
+    min-height: 52px;
+    padding: 14px 16px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.progress-item span { font-size: 15px; font-weight: 500; }
+.progress-item strong { font-size: 18px; font-weight: 700; }
+
+.progress-kategorie,
+.gesamt-kategorie {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.progress-kategorie img,
+.gesamt-kategorie img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.progress-item:nth-child(1) { background: #d5eaf2; color: #356477; }
+.progress-item:nth-child(2) { background: #dcefd1; color: #4d7048; }
+.progress-item:nth-child(3) { background: #ddd4ed; color: #66527d; }
+.progress-item:nth-child(4) { background: #eed8e9; color: #654d62; }
+
+.progress-total {
+    width: 100%;
+    margin-top: 18px;
+    padding: 12px 16px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    background: #e8ece6;
+}
+
+.progress-total-text {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+.progress-total-text span:first-child { color: #4d604f; font-size: 15px; }
+.progress-total-text span:last-child { color: #26352b; font-size: 18px; font-weight: 700; }
+
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    background: #dfe7dc;
+    overflow: hidden;
+    box-sizing: border-box;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #78a878, #9acb8f);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+}
+
+
+.meilensteine {
+    margin-bottom: 25px;
+    padding: 0;
+    background: transparent;
+}
+
+.meilenstein-liste {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.meilenstein {
+    min-height: 68px;
+    padding: 12px 14px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    background: #e8ece6;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: 0.2s ease;
+}
+
+.meilenstein:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.meilenstein-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 27px;
+}
+
+.meilenstein-icon img {
+    width: 38px;
+    height: 38px;
+    object-fit: contain;
+    display: block;
+}
+
+.meilenstein > div:not(.meilenstein-abzeichen-liste) {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.meilenstein strong { font-family: "DynaPuff", sans-serif; font-size: 15px; font-weight: 600; color: #39443b; }
+.meilenstein div span { font-size: 12px; color: #657065; }
+.meilenstein-abzeichen-liste {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.meilenstein-abzeichen-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.meilenstein-abzeichen-stufe {
+    font-family: "DynaPuff", sans-serif;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1;
+    color: #536257;
+    white-space: nowrap;
+}
+
+.meilenstein-abzeichen-item img {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.2s ease;
+}
+
+.meilenstein-abzeichen-item:hover img {
+    transform: scale(1.08);
+}
+
+.meilenstein-abzeichen {
+    width: 58px;
+    height: 58px;
+    padding: 0;
+    margin-left: auto;
+    flex-shrink: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease;
+}
+
+.meilenstein-abzeichen img {
+    width: 58px;
+    height: 58px;
+    object-fit: contain;
+    display: block;
+}
+
+.meilenstein-abzeichen:hover {
+    transform: scale(1.08);
+}
+
+#resetBereich {
+    width: 100%;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px !important;
+    margin-bottom: 25px !important;
+    box-sizing: border-box;
+}
+
+.reset-button {
+    width: 100%;
+    min-height: 48px;
+    padding: 10px 14px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    background: #e8e8e8;
+    color: #39443b;
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
+    transition: 0.2s ease;
+}
+
+.reset-button:hover { background: #dcebdc; transform: translateY(-2px); box-shadow: 0 5px 12px rgba(0, 0, 0, 0.09); }
+
+#kunstResetBereich {
+    width: 100%;
+    display: none !important;
+    justify-content: center;
+    margin: 20px 0 25px;
+    box-sizing: border-box;
+}
+
+#kunstResetBereich .reset-button { max-width: 400px; }
+
+.card {
+    height: 100%;
+    padding: 18px;
+    border: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 12px;
+    box-sizing: border-box;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.card.fisch { background: #e3f2f8; }
+.card.insekt { background: #e8f4df; }
+.card.meerestier { background: #e9e3f7; }
+.card.kunst { background: #f4e5f2; }
+
+.card-image {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    margin-bottom: 15px;
+    border-radius: 10px;
+    background: #f3f7f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-size: 55px;
+}
+
+.card-image img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; }
+.card-image img.unbekannt-bild { filter: grayscale(100%) brightness(0) blur(4px); transform: scale(1.05); }
+.card-image img.gefangen-bild { filter: none; }
+
+.card h3 {
+    margin-top: 0;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    line-height: 1.15;
+    color: #26352b;
+    min-height: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
+}
+
+.card.kunst h3 {
+    min-height: 52px;
+    height: 52px;
+    padding: 0 6px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.discovery-status {
+    margin-bottom: 5px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.card.fisch .discovery-status { background: #d5eaf2; color: #356477; }
+.card.insekt .discovery-status { background: #dcefd1; color: #4d7048; }
+.card.meerestier .discovery-status { background: #ddd4ed; color: #66527d; }
+.card.kunst .discovery-status { background: #eed8e9; color: #654d62; }
+.discovery-status.entdeckt { background: #d8ead9 !important; color: #46634a !important; }
+
+.price {
+    margin: 10px 0;
+    padding: 14px;
+    border-radius: 9px;
+    background: #f3f7f1;
+    color: #b27a25;
+    text-align: center;
+    font-weight: bold;
+}
+
+.card.fisch .month-info,
+.card.fisch .shadow-info > div,
+.card.fisch .fundbedingung,
+.card.fisch .price { background: #d5eaf2; }
+
+.card.insekt .month-info,
+.card.insekt .shadow-info > div,
+.card.insekt .fundbedingung,
+.card.insekt .price { background: #dcefd1; }
+
+.card.meerestier .month-info,
+.card.meerestier .shadow-info > div,
+.card.meerestier .fundbedingung,
+.card.meerestier .price { background: #ddd4ed; }
+
+.card.kunst .month-info,
+.card.kunst .shadow-info > div,
+.card.kunst .fundbedingung,
+.card.kunst .price { background: #eed8e9; }
+
+.time-info { margin: 10px 0; }
+.time-row { margin-bottom: 4px; }
+
+.shadow-info,
+.einzel-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+.einzel-info { grid-template-columns: 1fr; }
+
+.shadow-info > div,
+.einzel-info > div {
+    min-width: 0;
+    min-height: 52px;
+    padding: 10px;
+    border-radius: 9px;
+    background: #f3f7f1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.shadow-info small,
+.einzel-info small {
+    min-height: 18px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: 0;
+    color: #536257;
+    text-align: center;
+    white-space: normal;
+    overflow-wrap: normal;
+    hyphens: manual;
+}
+
+.shadow-info > div {
+    padding: 10px 5px;
+}
+
+.shadow-info strong,
+.einzel-info strong { font-size: 14px; font-weight: 500; line-height: 1.2; }
+.einzel-info strong { font-size: 15px; letter-spacing: 0.2px; }
+.info-emoji { font-family: "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 13px; line-height: 1; flex-shrink: 0; }
+.shadow-icon { font-size: 22px; }
+
+.fundbedingung {
+    min-height: 49px;
+    margin: 10px 0;
+    padding: 6px 10px;
+    border-radius: 9px;
+    background: #f3f7f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.1;
+}
+
+.caught-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #e8f0e6;
+    color: #3f6042;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.caught-button:hover { background: #d8e7d5; }
+.caught-button.caught,
+.card.kunst .caught-button.caught { background: #78a878; color: white; }
+.card.kunst .caught-button { background: #ead7e6; color: #654d62; }
+.card.kunst .caught-button:hover { background: #dfc5da; }
+
+.results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 15px;
+    align-items: stretch;
+}
+
+.empty {
+    grid-column: 1 / -1;
+    padding: 30px;
+    border-radius: 12px;
+    background: white;
+    text-align: center;
+}
+
+.image-status-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+    z-index: 2;
+}
+
+.image-status-button:hover { transform: scale(1.08); }
+.image-status-button.caught { background: #78a878; color: white; }
+
+/* Kunstkarten */
+.kunst-flip-container {
+    position: relative;
+    width: 100%;
+    height: 160px;
+    margin-bottom: 15px;
+    perspective: 1000px;
+}
+
+.kunst-flip-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.kunst-flip-inner.gedreht { transform: rotateY(180deg); }
+
+.kunst-flip-seite {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background: #f3f7f1;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.kunst-flip-seite img { width: 100%; height: 100%; object-fit: contain; border-radius: 10px; cursor: zoom-in; }
+.kunst-flip-rueckseite { transform: rotateY(180deg); }
+
+.kunst-flip-button,
+.kunst-dreh-button { cursor: pointer; }
+
+.kunst-dreh-button {
+    position: absolute;
+    top: 55px;
+    right: 10px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s ease;
+    z-index: 2;
+}
+
+.kunst-dreh-button:hover { transform: scale(1.08) rotate(20deg); }
+
+.kunstwerk {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #333;
+    border-radius: 9px;
+    background: #eed8e9;
+    color: #654d62;
+    text-align: center;
+    font-size: 14px;
+    font-style: italic;
+    line-height: 1.3;
+    box-shadow: inset 0 1px 2px rgba(101, 77, 98, 0.08);
+}
+
+.faelschung {
+    margin: 10px 0;
+    padding: 10px 12px;
+    border: 1px solid #333;
+    border-radius: 9px;
+    background: #f8edf6;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+/* Kunst-Modal */
+.kunst-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.kunst-modal.aktiv { display: flex; }
+
+.abzeichen-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.abzeichen-modal.aktiv {
+    display: flex;
+}
+
+.abzeichen-modal-inhalt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-width: 280px;
+    min-height: 280px;
+    padding: 35px;
+    background: #eef4e2;
+    border: 4px solid rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+#abzeichen-modal-bild {
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    display: block;
+}
+
+#abzeichen-modal-stufe {
+    margin-bottom: 8px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #536257;
+}
+
+#abzeichen-modal-name {
+    margin-top: 12px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 22px;
+    font-weight: 600;
+    color: #39443b;
+}
+
+#abzeichen-modal-fortschritt {
+    margin-top: 5px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 14px;
+    color: #657065;
+}
+
+.abzeichen-modal-pfeil {
+    position: absolute;
+    top: 50%;
+    width: 55px;
+    height: 70px;
+    transform: translateY(-50%);
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #333;
+    font-size: 48px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: 0.2s ease;
+}
+
+.abzeichen-modal-pfeil:hover {
+    background: white;
+    transform: translateY(-50%) scale(1.08);
+}
+
+.abzeichen-modal-zurueck {
+    left: 25px;
+}
+
+.abzeichen-modal-weiter {
+    right: 25px;
+}
+
+.abzeichen-modal-schliessen {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #39443b;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.abzeichen-modal-schliessen:hover {
+    transform: scale(1.08);
+}
+
+
+
+
+
+
+
+.kunst-modal-schliessen {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 50%;
+    background: white;
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.kunst-modal-schliessen:hover { transform: scale(1.08); }
+
+.kunst-modal-pfeil {
+    position: absolute;
+    top: 50%;
+    width: 55px;
+    height: 70px;
+    transform: translateY(-50%);
+    border: none;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #333;
+    font-size: 48px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    transition: 0.2s ease;
+}
+
+.kunst-modal-pfeil:hover { background: white; transform: translateY(-50%) scale(1.08); }
+.kunst-modal-zurueck { left: 25px; }
+.kunst-modal-weiter { right: 25px; }
+
+@media (max-width: 800px) {
+    .months { grid-template-columns: repeat(4, 1fr); }
+    .filters { grid-template-columns: repeat(2, 1fr); }
+    #kunstFilterBereich { grid-template-columns: repeat(2, 1fr); }
+    .progress-stats { grid-template-columns: repeat(2, 1fr); }
+    .meilenstein-liste { grid-template-columns: repeat(2, 1fr); }
+    #resetBereich { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 500px) {
+    .container { padding: 15px; }
+    .filters,
+    #kunstFilterBereich { grid-template-columns: 1fr; }
+    .meilenstein-liste,
+    #resetBereich { grid-template-columns: 1fr; }
+}
+
+/* Alle Bereichsüberschriften einheitlich */
+h2 {
+    font-family: "DynaPuff", sans-serif !important;
+    font-size: 24px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    color: #26352b !important;
+    margin: 0 0 16px !important;
+}
+#monatUeberschrift {
+    margin-top: 25px !important;
+}
+
+/* Dünner Rand für alle Info-Fenster auf den Karten */
+.discovery-status,
+.month-info,
+.shadow-info > div,
+.einzel-info > div,
+.fundbedingung,
+.price {
+    border: 1px solid #333;
+}
+
+/* Dünner Rand um die Bilder */
+.card-image,
+.kunst-flip-seite {
+    border: 1px solid #333;
+}
+
+/* =========================================================
+   KUNST-GROSSANSICHT – ORIGINAL + FÄLSCHUNG
+   ========================================================= */
+
+.kunst-modal-inhalt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: min(1100px, 90vw);
+    max-height: 90vh;
+}
+
+.kunst-modal-bilder {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 35px;
+    width: 100%;
+}
+
+.kunst-modal-seite {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.kunst-modal-seiten-titel {
+    margin-bottom: 10px;
+    padding: 7px 14px;
+    border-radius: 8px;
+    background: white;
+    color: #654d62;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.kunst-modal-bildrahmen {
+    width: min(400px, 38vw);
+    height: min(500px, 65vh);
+    padding: 12px;
+    border: 2px solid rgba(255, 255, 255, 0.9);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.kunst-modal-bildrahmen img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    box-shadow: none;
+}
+
+#kunst-modal-name {
+    position: static;
+    transform: none;
+    margin-top: 15px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: white;
+    color: #654d62;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+#kunst-modal-faelschung {
+    display: none;
+    width: min(800px, 80vw);
+    margin-top: 12px;
+    padding: 12px 18px;
+    border: 2px solid #654d62;
+    border-radius: 10px;
+    background: #f8edf6;
+    color: #654d62;
+    text-align: center;
+    box-shadow: 0 5px 18px rgba(0, 0, 0, 0.18);
+}
+
+#kunst-modal-faelschung strong {
+    display: block;
+    margin-bottom: 5px;
+    font-family: "DynaPuff", sans-serif;
+    font-size: 14px;
+}
+
+#kunst-modal-faelschung-text {
+    display: block;
+    font-size: 14px;
+    line-height: 1.35;
+}
+
+@media (max-width: 800px) {
+
+    .kunst-modal {
+        padding: 20px 10px;
+    }
+
+    .kunst-modal-inhalt {
+        width: 94vw;
+    }
+
+    .kunst-modal-bilder {
+        gap: 10px;
+    }
+
+    .kunst-modal-bildrahmen {
+        width: 44vw;
+        height: 55vh;
+        padding: 7px;
+    }
+
+    .kunst-modal-seiten-titel {
+        font-size: 12px;
+        padding: 5px 8px;
+    }
+
+    #kunst-modal-name {
+        font-size: 15px;
+    }
+
+    #kunst-modal-faelschung {
+        width: 90vw;
+        font-size: 13px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+<header>
+    <img src="InselDex-Logo.png" alt="InselDex – Dein persönlicher Animal-Crossing-Begleiter">
+</header>
+
+<div class="container">
+
+    <div class="progress-box">
+        <h2>📊 Dein Fortschritt</h2>
+
+        <div class="progress-stats">
+            <div class="progress-item">
+                <span class="progress-kategorie"><img src="bilder/icons/fisch.png" alt="">Fische</span>
+                <strong id="fischFortschritt">0 / 80</strong>
+            </div>
+            <div class="progress-item">
+                <span class="progress-kategorie"><img src="bilder/icons/insekt.png" alt="">Insekten</span>
+                <strong id="insektFortschritt">0 / 80</strong>
+            </div>
+            <div class="progress-item">
+                <span class="progress-kategorie"><img src="bilder/icons/meerestiere.png" alt="">Meerestiere</span>
+                <strong id="meerFortschritt">0 / 40</strong>
+            </div>
+            <div class="progress-item">
+                <span class="progress-kategorie"><img src="bilder/icons/kunst.png" alt="">Kunst</span>
+                <strong id="kunstFortschritt">0 / 43</strong>
+            </div>
+        </div>
+
+        <div class="progress-total">
+            <div class="progress-total-text">
+                <span class="gesamt-kategorie"><img src="bilder/icons/alle.png" alt="">Gesamtfortschritt</span>
+                <span id="gesamtFortschritt">0 / 243</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="gesamtFortschrittBalken"></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="meilensteine-ueberschrift">🏆 Meilensteine</h2>
+    <div class="meilensteine">
+        
+        <div class="meilenstein-liste">
+
+    <div class="meilenstein" data-meilenstein-kategorie="Fisch">
+        <span class="meilenstein-icon">
+    <img src="bilder/icons/fisch.png" alt="">
+</span>
+        <div>
+            <strong id="meilensteinFischName">Angelanfänger</strong>
+            <span id="meilensteinFischText">0 / 10</span>
+        </div>
+        <div class="meilenstein-abzeichen-liste" id="meilensteinFischAbzeichen"></div>
+    </div>
+
+    <div class="meilenstein" data-meilenstein-kategorie="Insekt">
+        <span class="meilenstein-icon">
+    <img src="bilder/icons/insekt.png" alt="">
+</span>
+        <div>
+            <strong id="meilensteinInsektName">Käferneuling</strong>
+            <span id="meilensteinInsektText">0 / 10</span>
+        </div>
+        <div class="meilenstein-abzeichen-liste" id="meilensteinInsektAbzeichen"></div>
+    </div>
+
+    <div class="meilenstein" data-meilenstein-kategorie="Meerestier">
+        <span class="meilenstein-icon">
+    <img src="bilder/icons/meerestiere.png" alt="">
+</span>
+        <div>
+            <strong id="meilensteinMeerName">Schnorchelanfänger</strong>
+            <span id="meilensteinMeerText">0 / 5</span>
+        </div>
+        <div class="meilenstein-abzeichen-liste" id="meilensteinMeerAbzeichen"></div>
+    </div>
+
+    <div class="meilenstein" data-meilenstein-kategorie="Kunst">
+        <span class="meilenstein-icon">
+    <img src="bilder/icons/kunst.png" alt="">
+</span>
+        <div>
+            <strong id="meilensteinKunstName">Kunstneuling</strong>
+            <span id="meilensteinKunstText">0 / 5</span>
+        </div>
+        <div class="meilenstein-abzeichen-liste" id="meilensteinKunstAbzeichen"></div>
+    </div>
+
+</div>
+
+    <h2 id="monatUeberschrift">📅 Monate</h2>
+    <div class="months" id="monatBereich">
+        <button class="month" data-month="alle">Alle</button>
+        <button class="month" data-month="1">Januar</button>
+        <button class="month" data-month="2">Februar</button>
+        <button class="month" data-month="3">März</button>
+        <button class="month" data-month="4">April</button>
+        <button class="month" data-month="5">Mai</button>
+        <button class="month" data-month="6">Juni</button>
+        <button class="month" data-month="7">Juli</button>
+        <button class="month" data-month="8">August</button>
+        <button class="month" data-month="9">September</button>
+        <button class="month" data-month="10">Oktober</button>
+        <button class="month" data-month="11">November</button>
+        <button class="month" data-month="12">Dezember</button>
+    </div>
+
+    <h2>📚 Kategorie</h2>
+    <div class="categories">
+        <button class="category"><img src="bilder/icons/alle.png" alt=""><span>Alle</span></button>
+        <button class="category"><img src="bilder/icons/fisch.png" alt=""><span>Fische</span></button>
+        <button class="category"><img src="bilder/icons/insekt.png" alt=""><span>Insekten</span></button>
+        <button class="category"><img src="bilder/icons/meerestiere.png" alt=""><span>Meerestiere</span></button>
+        <button class="category"><img src="bilder/icons/kunst.png" alt=""><span>Kunst</span></button>
+    </div>
+
+    <h2 id="filterUeberschrift">🔎 Filter</h2>
+
+    <div class="filters" id="kunstFilterBereich" style="display: none;">
+        <div class="filter"><label>🔎 Name</label><input type="text" id="kunstSucheInput" placeholder="Kunstwerk suchen..."></div>
+        <div class="filter"><label>📋 Status</label><select id="kunstStatusInput"><option value="alle">Alle</option><option value="offen">Noch nicht entdeckt</option><option value="entdeckt">Entdeckt</option></select></div>
+        <div class="filter"><label>🧐 Echtheit</label><select id="kunstEchtheitInput"><option value="alle">Alle</option><option value="echt">Immer echt</option><option value="faelschung">Kann Fälschung sein</option></select></div>
+        <div class="filter"><label>🖼️ Art</label><select id="kunstArtInput"><option value="alle">Alle</option><option value="gemaelde">Gemälde</option><option value="skulptur">Skulpturen</option></select></div>
+    </div>
+
+    <div id="kunstResetBereich">
+        <button id="kunstFilterReset" class="reset-button">🔄 Filter zurücksetzen</button>
+    </div>
+
+    <div class="filters" id="filterBereich">
+        <div class="filter"><label>🔎 Suche</label><input type="text" id="sucheInput" placeholder="Name suchen..."></div>
+        <div class="filter"><label id="fundortLabel">📍 Fundort</label><select id="fundortInput"><option value="Alle">Alle</option></select></div>
+        <div class="filter"><label>💰 Preis ab</label><input type="number" id="preisInput" placeholder="z. B. 5000"></div>
+        <div class="filter"><label>🕐 Uhrzeit</label><select id="uhrzeitInput">
+            <option value="">Alle Zeiten</option>
+            <option value="aktuell">🟢 Aktuelle Uhrzeit</option>
+            <option value="0">00:00 Uhr</option><option value="1">01:00 Uhr</option><option value="2">02:00 Uhr</option><option value="3">03:00 Uhr</option>
+            <option value="4">04:00 Uhr</option><option value="5">05:00 Uhr</option><option value="6">06:00 Uhr</option><option value="7">07:00 Uhr</option>
+            <option value="8">08:00 Uhr</option><option value="9">09:00 Uhr</option><option value="10">10:00 Uhr</option><option value="11">11:00 Uhr</option>
+            <option value="12">12:00 Uhr</option><option value="13">13:00 Uhr</option><option value="14">14:00 Uhr</option><option value="15">15:00 Uhr</option>
+            <option value="16">16:00 Uhr</option><option value="17">17:00 Uhr</option><option value="18">18:00 Uhr</option><option value="19">19:00 Uhr</option>
+            <option value="20">20:00 Uhr</option><option value="21">21:00 Uhr</option><option value="22">22:00 Uhr</option><option value="23">23:00 Uhr</option>
+        </select></div>
+        <div class="filter"><label>📋 Status</label><select id="statusFilter"><option value="alle">Alle</option><option value="offen">Noch nicht gefangen</option><option value="gefangen">Gefangen</option></select></div>
+    </div>
+
+    <div id="resetBereich">
+        <button id="filterReset" class="reset-button">🎯 Jetzt fangbar</button>
+        <button id="neuDiesenMonat" class="reset-button">✨ Neu diesen Monat</button>
+        <button id="baldWeg" class="reset-button">⚠️ Bald weg</button>
+        <button id="filterResetNur" class="reset-button">🔄 Filter zurücksetzen</button>
+    </div>
+
+    <h2>📋 Übersicht</h2>
+    <div class="results" id="results"></div>
+</div>
+
+<div id="kunst-modal" class="kunst-modal">
+    <button class="kunst-modal-schliessen" type="button">✕</button>
+
+    <button class="kunst-modal-pfeil kunst-modal-zurueck" type="button">‹</button>
+
+    <div class="kunst-modal-inhalt">
+
+        <div class="kunst-modal-bilder">
+
+            <div class="kunst-modal-seite">
+                <div class="kunst-modal-seiten-titel">✅ Original</div>
+                <div class="kunst-modal-bildrahmen">
+                    <img id="kunst-modal-original" src="" alt="">
+                </div>
+            </div>
+
+            <div class="kunst-modal-seite">
+                <div class="kunst-modal-seiten-titel">🔎 Fälschung</div>
+                <div class="kunst-modal-bildrahmen">
+                    <img id="kunst-modal-fake" src="" alt="">
+                </div>
+            </div>
+
+        </div>
+
+        <div id="kunst-modal-name"></div>
+
+        <div id="kunst-modal-faelschung">
+            <strong>🔎 Woran erkennt man die Fälschung?</strong>
+            <span id="kunst-modal-faelschung-text"></span>
+        </div>
+
+    </div>
+
+    <button class="kunst-modal-pfeil kunst-modal-weiter" type="button">›</button>
+</div>
+
+<div id="abzeichen-modal" class="abzeichen-modal">
+    <button class="abzeichen-modal-schliessen" type="button">✕</button>
+
+    <button id="abzeichen-modal-zurueck" class="abzeichen-modal-pfeil abzeichen-modal-zurueck" type="button">
+        ‹
+    </button>
+
+    <div class="abzeichen-modal-inhalt">
+    <div id="abzeichen-modal-stufe"></div>
+    <img id="abzeichen-modal-bild" src="" alt="">
+    <div id="abzeichen-modal-name"></div>
+    <div id="abzeichen-modal-fortschritt"></div>
+</div>
+
+    <button id="abzeichen-modal-weiter" class="abzeichen-modal-pfeil abzeichen-modal-weiter" type="button">
+        ›
+    </button>
+</div>
+
+<script src="daten.js?v=2"></script>
+
+<script>
+const results = document.getElementById("results");
+const monate = document.querySelectorAll(".month");
+const kategorien = document.querySelectorAll(".category");
+
+const preisInput = document.getElementById("preisInput");
+const fundortInput = document.getElementById("fundortInput");
+const uhrzeitInput = document.getElementById("uhrzeitInput");
+const sucheInput = document.getElementById("sucheInput");
+const statusFilter = document.getElementById("statusFilter");
+
+const kunstSucheInput = document.getElementById("kunstSucheInput");
+const kunstStatusInput = document.getElementById("kunstStatusInput");
+const kunstEchtheitInput = document.getElementById("kunstEchtheitInput");
+const kunstArtInput = document.getElementById("kunstArtInput");
+const kunstFilterReset = document.getElementById("kunstFilterReset");
+
+let ausgewaehlterMonat = new Date().getMonth() + 1;
+let ausgewaehlteKategorie = "Alle";
+let mindestpreis = 0;
+let ausgewaehlterFundort = "Alle";
+let ausgewaehlteUhrzeit = "aktuell";
+let suchtext = "";
+let ausgewaehlterStatus = "alle";
+let zeigeNeueDiesenMonat = false;
+let zeigeBaldWeg = false;
+let aktuelleKunstIndex = 0;
+let kunstGalerie = [];
+
+const kategorienMap = {
+    "Alle": "Alle",
+    "Fische": "Fisch",
+    "Insekten": "Insekt",
+    "Meerestiere": "Meerestier",
+    "Kunst": "Kunst"
+};
+
+const monatsnamen = [
+    "Januar", "Februar", "März", "April", "Mai", "Juni",
+    "Juli", "August", "September", "Oktober", "November", "Dezember"
+];
+
+const fundorteFisch = [
+    "Alle", "Fluss", "Teich", "Meer", "Steg", "Fluss (Plateau)", "Flussmündung"
+];
+
+const fundorteInsekt = [
+    "Alle", "Luft", "Boden", "Bäume", "Palmen", "Blumen", "Gewässer", "Strand",
+    "Steine", "Müll", "Lichtquellen", "Unter der Erde", "Baumstümpfe", "Schneebälle", "Auf Bewohnern"
+];
+
+function aktualisiereKunstBereiche() {
+    const istKunst = ausgewaehlteKategorie === "Kunst";
+
+    document.getElementById("monatUeberschrift").style.display = istKunst ? "none" : "";
+    document.getElementById("monatBereich").style.display = istKunst ? "none" : "";
+    document.getElementById("filterUeberschrift").style.display = "";
+    document.getElementById("filterBereich").style.display = istKunst ? "none" : "";
+    document.getElementById("kunstFilterBereich").style.display = istKunst ? "grid" : "none";
+    document.getElementById("resetBereich").style.setProperty("display", istKunst ? "none" : "grid", "important");
+    document.getElementById("kunstResetBereich").style.setProperty("display", istKunst ? "flex" : "none", "important");
+}
+
+function speichereFilter() {
+    localStorage.setItem("filter_monat", ausgewaehlterMonat);
+    localStorage.setItem("filter_kategorie", ausgewaehlteKategorie);
+    localStorage.setItem("filter_preis", mindestpreis);
+    localStorage.setItem("filter_fundort", ausgewaehlterFundort);
+    localStorage.setItem("filter_uhrzeit", ausgewaehlteUhrzeit);
+    localStorage.setItem("filter_suche", suchtext);
+    localStorage.setItem("filter_status", ausgewaehlterStatus);
+    localStorage.setItem("filter_kunst_suche", kunstSucheInput.value);
+    localStorage.setItem("filter_kunst_status", kunstStatusInput.value);
+    localStorage.setItem("filter_kunst_echtheit", kunstEchtheitInput.value);
+    localStorage.setItem("filter_kunst_art", kunstArtInput.value);
+}
+
+function ladeGespeicherteFilter() {
+    const monat = localStorage.getItem("filter_monat");
+    const kategorie = localStorage.getItem("filter_kategorie");
+    const preis = localStorage.getItem("filter_preis");
+    const fundort = localStorage.getItem("filter_fundort");
+    const uhrzeit = localStorage.getItem("filter_uhrzeit");
+    const suche = localStorage.getItem("filter_suche");
+    const status = localStorage.getItem("filter_status");
+    const kunstSuche = localStorage.getItem("filter_kunst_suche");
+    const kunstStatus = localStorage.getItem("filter_kunst_status");
+    const kunstEchtheit = localStorage.getItem("filter_kunst_echtheit");
+    const kunstArt = localStorage.getItem("filter_kunst_art");
+
+    if (monat !== null) ausgewaehlterMonat = monat === "alle" ? "alle" : Number(monat);
+    if (kategorie !== null && kategorienMap[kategorie] !== undefined) ausgewaehlteKategorie = kategorie;
+    if (preis !== null) mindestpreis = Number(preis) || 0;
+    if (fundort !== null) ausgewaehlterFundort = fundort;
+    if (uhrzeit !== null) ausgewaehlteUhrzeit = uhrzeit;
+    if (suche !== null) suchtext = suche;
+    if (status !== null) ausgewaehlterStatus = status;
+
+    if (kunstSuche !== null) kunstSucheInput.value = kunstSuche;
+    if (kunstStatus !== null) kunstStatusInput.value = kunstStatus;
+    if (kunstEchtheit !== null) kunstEchtheitInput.value = kunstEchtheit;
+    if (kunstArt !== null) kunstArtInput.value = kunstArt;
+}
+
+function aktualisiereFundortFilter() {
+    let optionen;
+    const fundortLabel = document.getElementById("fundortLabel");
+    const alterFundort = ausgewaehlterFundort;
+
+    if (ausgewaehlteKategorie === "Fisch") {
+        fundortLabel.textContent = "📍 Fundort";
+        optionen = fundorteFisch;
+    } else if (ausgewaehlteKategorie === "Insekt") {
+        fundortLabel.textContent = "📍 Fundort";
+        optionen = fundorteInsekt;
+    } else if (ausgewaehlteKategorie === "Meerestier") {
+        fundortLabel.textContent = "💨 Geschwindigkeit";
+        optionen = ["Alle", "stillstehend", "sehr langsam", "langsam", "mittel", "schnell", "sehr schnell"];
+    } else {
+        fundortLabel.textContent = "📍 Fundort";
+        optionen = ["Alle"];
+    }
+
+    fundortInput.innerHTML = "";
+    optionen.forEach(option => {
+        const neueOption = document.createElement("option");
+        neueOption.value = option;
+        neueOption.textContent = option;
+        fundortInput.appendChild(neueOption);
+    });
+
+    ausgewaehlterFundort = optionen.includes(alterFundort) ? alterFundort : "Alle";
+    fundortInput.value = ausgewaehlterFundort;
+}
+
+function istNeuDiesenMonat(tier) {
+    if (tier.kategorie === "Kunst" || !Array.isArray(tier.monateNord) || ausgewaehlterMonat === "alle") return false;
+
+    const vorherigerMonat = ausgewaehlterMonat === 1 ? 12 : ausgewaehlterMonat - 1;
+    return tier.monateNord.includes(ausgewaehlterMonat) && !tier.monateNord.includes(vorherigerMonat);
+}
+
+function istBaldWeg(tier) {
+    if (tier.kategorie === "Kunst" || !Array.isArray(tier.monateNord) || ausgewaehlterMonat === "alle") return false;
+
+    const naechsterMonat = ausgewaehlterMonat === 12 ? 1 : ausgewaehlterMonat + 1;
+    return tier.monateNord.includes(ausgewaehlterMonat) && !tier.monateNord.includes(naechsterMonat);
+}
+
+function tierIstGefangen(tier) {
+    return localStorage.getItem("gefangen_" + tier.name) === "true";
+}
+
+function passtZurUhrzeit(tier) {
+    if (tier.kategorie === "Kunst" || ausgewaehlteUhrzeit === "") return true;
+
+    const stunde = ausgewaehlteUhrzeit === "aktuell"
+        ? new Date().getHours()
+        : Number(ausgewaehlteUhrzeit);
+
+    function passt(vonText, bisText) {
+        const von = Number(vonText.split(":")[0]);
+        const bis = Number(bisText.split(":")[0]);
+        if (von < bis) return stunde >= von && stunde < bis;
+        if (von > bis) return stunde >= von || stunde < bis;
+        return true;
+    }
+
+    if (tier.zeitfenster) {
+        const passendesZeitfenster = tier.zeitfenster.find(z => z.monate.includes(ausgewaehlterMonat));
+        return passendesZeitfenster ? passt(passendesZeitfenster.von, passendesZeitfenster.bis) : false;
+    }
+
+    if (tier.uhrzeiten) return tier.uhrzeiten.some(z => passt(z[0], z[1]));
+    if (tier.uhrzeitVon && tier.uhrzeitBis) return passt(tier.uhrzeitVon, tier.uhrzeitBis);
+    return true;
+}
+
+function istSkulptur(tier) {
+    return /statue|skulptur|büste$/i.test(tier.name);
+}
+
+function passtZuKunst(tier) {
+    const namePasst = tier.name.toLowerCase().includes(kunstSucheInput.value.toLowerCase());
+    const gespeichert = tierIstGefangen(tier);
+    const statusPasst = kunstStatusInput.value === "alle"
+        || (kunstStatusInput.value === "entdeckt" && gespeichert)
+        || (kunstStatusInput.value === "offen" && !gespeichert);
+    const echtheitPasst = kunstEchtheitInput.value === "alle"
+        || (kunstEchtheitInput.value === "echt" && tier.immerEcht)
+        || (kunstEchtheitInput.value === "faelschung" && !tier.immerEcht);
+    const skulptur = istSkulptur(tier);
+    const artPasst = kunstArtInput.value === "alle"
+        || (kunstArtInput.value === "gemaelde" && !skulptur)
+        || (kunstArtInput.value === "skulptur" && skulptur);
+
+    return namePasst && statusPasst && echtheitPasst && artPasst;
+}
+
+function passtZumFundort(tier) {
+    if (tier.kategorie === "Kunst" || ausgewaehlterFundort === "Alle") return true;
+    if (tier.kategorie === "Meerestier") return tier.geschwindigkeit === ausgewaehlterFundort;
+    return Array.isArray(tier.fundort)
+        ? tier.fundort.includes(ausgewaehlterFundort)
+        : tier.fundort === ausgewaehlterFundort;
+}
+
+function tierPasst(tier) {
+    const passtKategorie = ausgewaehlteKategorie === "Alle"
+        ? tier.kategorie !== "Kunst"
+        : tier.kategorie === ausgewaehlteKategorie;
+
+    if (!passtKategorie) return false;
+
+    const passtNeu = !zeigeNeueDiesenMonat || istNeuDiesenMonat(tier);
+    const passtBald = !zeigeBaldWeg || istBaldWeg(tier);
+    if (!passtNeu || !passtBald) return false;
+
+    if (tier.kategorie === "Kunst") return passtZuKunst(tier);
+
+    const passtMonat = ausgewaehlterMonat === "alle" || tier.monateNord.includes(ausgewaehlterMonat);
+    const gespeichert = tierIstGefangen(tier);
+    const passtStatus = ausgewaehlterStatus === "alle"
+        || (ausgewaehlterStatus === "gefangen" && gespeichert)
+        || (ausgewaehlterStatus === "offen" && !gespeichert);
+    const passtPreis = tier.preis >= mindestpreis;
+    const passtSuche = tier.name.toLowerCase().includes(suchtext.toLowerCase());
+
+    return passtMonat
+        && passtStatus
+        && passtPreis
+        && passtZumFundort(tier)
+        && passtZurUhrzeit(tier)
+        && passtSuche;
+}
+
+function formatiereMonate(monate) {
+    if (!Array.isArray(monate) || monate.length === 0) return "";
+
+    const sortierteMonate = [...monate].sort((a, b) => a - b);
+    if (sortierteMonate.length === 12) return '<span class="month-range">Ganzjährig</span>';
+
+    const zeitraeume = [];
+    let start = sortierteMonate[0];
+    let vorher = sortierteMonate[0];
+
+    for (let i = 1; i < sortierteMonate.length; i++) {
+        const aktuell = sortierteMonate[i];
+        if (aktuell === vorher + 1) {
+            vorher = aktuell;
+        } else {
+            zeitraeume.push([start, vorher]);
+            start = aktuell;
+            vorher = aktuell;
+        }
+    }
+    zeitraeume.push([start, vorher]);
+
+    return zeitraeume.map(([von, bis]) =>
+        von === bis
+            ? `<span class="month-range">${monatsnamen[von - 1]}</span>`
+            : `<span class="month-range">${monatsnamen[von - 1]} – ${monatsnamen[bis - 1]}</span>`
+    ).join(", ");
+}
+
+function formatiereZeitfenster(tier) {
+    if (tier.zeitfenster) {
+        return tier.zeitfenster.map(zeit => {
+            const monateAnzeige = formatiereMonate(zeit.monate);
+            const ganztag = zeit.von === "00:00" && zeit.bis === "24:00";
+            return `<div class="time-season"><div class="season-month">🗓️ ${monateAnzeige}</div><div class="season-time">🕐 ${ganztag ? "Ganztägig" : `${zeit.von} – ${zeit.bis} Uhr`}</div></div>`;
+        }).join("");
+    }
+
+    const monateText = formatiereMonate(tier.monateNord);
+    const zeiten = tier.uhrzeiten
+        ? tier.uhrzeiten.map(zeit => `<div>🕐 ${zeit[0]} – ${zeit[1]} Uhr</div>`).join("")
+        : `🕐 ${tier.uhrzeitVon} – ${tier.uhrzeitBis} Uhr`;
+
+    return `<div class="time-season"><div class="season-month">🗓️ ${monateText}</div><div class="season-time">${zeiten}</div></div>`;
+}
+
+function erzeugeStatusButton(tier, karte) {
+    const statusButton = karte.querySelector(".image-status-button");
+    if (!statusButton) return;
+
+    statusButton.addEventListener("click", () => {
+        const neuerStatus = !statusButton.classList.contains("caught");
+        localStorage.setItem("gefangen_" + tier.name, neuerStatus);
+        statusButton.classList.toggle("caught", neuerStatus);
+        statusButton.textContent = neuerStatus ? "✓" : "🔒";
+
+        if (tier.kategorie !== "Kunst") {
+            const bild = karte.querySelector(".card-image img");
+            if (bild) {
+                bild.classList.toggle("gefangen-bild", neuerStatus);
+                bild.classList.toggle("unbekannt-bild", !neuerStatus);
+            }
+        }
+
+        const status = karte.querySelector(".discovery-status");
+        if (status) {
+            status.classList.toggle("entdeckt", neuerStatus);
+            status.classList.toggle("offen", !neuerStatus);
+            status.textContent = neuerStatus ? "✨ Entdeckt!" : "🔒 Noch nicht entdeckt";
+        }
+
+        aktualisiereFortschritt();
+        zeigeTiere();
+    });
+}
+
+function erzeugeKunstKarte(tier) {
+    const karte = document.createElement("div");
+    karte.className = "card kunst";
+    const gespeichert = tierIstGefangen(tier);
+
+    karte.innerHTML = `
+        <h3 class="kunst-name">${tier.name}</h3>
+        <div class="kunst-flip-container">
+            <div class="kunst-flip-inner">
+                <div class="kunst-flip-seite">
+                    <img src="${tier.bild || ""}" alt="${tier.name}">
+                </div>
+                ${tier.bildFake ? `<div class="kunst-flip-seite kunst-flip-rueckseite"><img src="${tier.bildFake}" alt="${tier.name} – Fälschung"></div>` : ""}
+            </div>
+            <button class="image-status-button ${gespeichert ? "caught" : ""}" type="button">${gespeichert ? "✓" : "🔒"}</button>
+            ${tier.bildFake ? `<button class="kunst-dreh-button" type="button" title="Kunstwerk drehen">↻</button>` : ""}
+        </div>
+        <div class="discovery-status ${gespeichert ? "entdeckt" : "offen"}">${gespeichert ? "✨ Entdeckt!" : "🔒 Noch nicht entdeckt"}</div>
+        <div class="kunstwerk">🎨 ${tier.kunstwerk || ""}</div>
+        <div class="faelschung">${tier.immerEcht ? "✅ Dieses Kunstwerk ist immer echt." : "🔎 " + (tier.faelschung || "")}</div>
+    `;
+
+    erzeugeStatusButton(tier, karte);
+
+    const flipButton = karte.querySelector(".kunst-dreh-button");
+    const flipInner = karte.querySelector(".kunst-flip-inner");
+    if (flipButton && flipInner) flipButton.addEventListener("click", () => flipInner.classList.toggle("gedreht"));
+
+    karte.querySelectorAll(".kunst-flip-seite img").forEach(bild => {
+        bild.addEventListener("click", () => oeffneKunstGalerie(tier, bild));
+    });
+
+    results.appendChild(karte);
+    passeKunstNamensgroesseAn(karte);
+}
+
+function passeKunstNamensgroesseAn(karte) {
+    const kunstName = karte.querySelector(".kunst-name");
+    if (!kunstName) return;
+
+    const anpassen = () => {
+        let schriftgroesse = 23;
+        kunstName.style.fontSize = schriftgroesse + "px";
+        while (kunstName.scrollWidth > kunstName.clientWidth && schriftgroesse > 14) {
+            schriftgroesse--;
+            kunstName.style.fontSize = schriftgroesse + "px";
+        }
+    };
+
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(anpassen);
+    else anpassen();
+}
+
+function erzeugeTierKarte(tier) {
+    const karte = document.createElement("div");
+    karte.className = "card " + tier.kategorie.toLowerCase();
+    const gespeichert = tierIstGefangen(tier);
+
+    let zusatzInfo = "";
+    if (tier.kategorie === "Meerestier") {
+        zusatzInfo = `
+            <div class="shadow-info">
+                <div><small><span class="info-emoji">🫧</span><span>Schatten</span></small><strong>${tier.schatten || ""}</strong></div>
+                <div><small><span class="info-emoji">💨</span><span>Geschwindig&shy;keit</span></small><strong>${tier.geschwindigkeit || ""}</strong></div>
+            </div>`;
+    } else if (tier.kategorie === "Insekt") {
+        zusatzInfo = `
+            <div class="shadow-info">
+                <div><small><span class="info-emoji">📍</span><span>Fundort</span></small><strong>${Array.isArray(tier.fundort) ? tier.fundort.join(" & ") : tier.fundort || ""}</strong></div>
+                <div><small>🌦️ Wetter</small><strong>${tier.wetter || "beliebig"}</strong></div>
+            </div>
+            ${tier.fundbedingung ? `<div class="fundbedingung">🔎 ${tier.fundbedingung}</div>` : ""}`;
+    } else {
+        zusatzInfo = `
+            <div class="shadow-info">
+                <div><small>📍 Fundort</small><strong>${Array.isArray(tier.fundort) ? tier.fundort.join(" & ") : tier.fundort || ""}</strong></div>
+                <div><small><span class="info-emoji">🐟</span><span>Fisch&shy;schatten</span></small><strong>${tier.schatten || ""}</strong></div>
+            </div>
+            ${tier.fundbedingung ? `<div class="fundbedingung">🔎 ${tier.fundbedingung}</div>` : ""}`;
+    }
+
+    karte.innerHTML = `
+        <h3>${tier.name}</h3>
+        <div class="card-image">
+            ${tier.bild ? `<img src="${tier.bild}" alt="${tier.name}" class="${gespeichert ? "gefangen-bild" : "unbekannt-bild"}">` : "🐟"}
+            <button class="image-status-button ${gespeichert ? "caught" : ""}" type="button">${gespeichert ? "✓" : "🔒"}</button>
+        </div>
+        <div class="discovery-status ${gespeichert ? "entdeckt" : "offen"}">${gespeichert ? "✨ Entdeckt!" : "🔒 Noch nicht entdeckt"}</div>
+        <div class="month-info">${formatiereZeitfenster(tier)}</div>
+        ${zusatzInfo}
+        <p class="price">💰 ${(tier.preis || 0).toLocaleString("de-DE")} Sternis</p>
+    `;
+
+    erzeugeStatusButton(tier, karte);
+    results.appendChild(karte);
+}
+
+function passeKartennamenAn() {
+    document.querySelectorAll(".card h3").forEach(name => {
+
+        let groesse = 20;
+        name.style.fontSize = groesse + "px";
+
+        while (name.scrollWidth > name.clientWidth && groesse > 11) {
+            groesse -= 0.5;
+            name.style.fontSize = groesse + "px";
+        }
+    });
+}
+
+function zeigeTiere() {
+    results.innerHTML = "";
+    const gefilterteTiere = daten.filter(tierPasst).sort((a, b) => a.name.localeCompare(b.name, "de"));
+
+    if (gefilterteTiere.length === 0) {
+        results.innerHTML = `<div class="empty"><h3>Keine Einträge gefunden</h3><p>Für diese Auswahl gibt es momentan keine Tiere.</p></div>`;
+        return;
+    }
+
+    gefilterteTiere.forEach(tier => {
+    if (tier.kategorie === "Kunst") {
+        erzeugeKunstKarte(tier);
+    } else {
+        erzeugeTierKarte(tier);
+    }
+});
+
+passeKartennamenAn();
+}
+
+const kunstModal = document.getElementById("kunst-modal");
+const kunstModalOriginal = document.getElementById("kunst-modal-original");
+const kunstModalFake = document.getElementById("kunst-modal-fake");
+const kunstModalName = document.getElementById("kunst-modal-name");
+const kunstModalFaelschung = document.getElementById("kunst-modal-faelschung");
+const kunstModalFaelschungText = document.getElementById("kunst-modal-faelschung-text");
+const kunstZurueck = document.querySelector(".kunst-modal-zurueck");
+const kunstWeiter = document.querySelector(".kunst-modal-weiter");
+const kunstModalSchliessen = document.querySelector(".kunst-modal-schliessen");
+
+function zeigeKunstwerk(index) {
+    if (kunstGalerie.length === 0) return;
+
+    aktuelleKunstIndex =
+        (index + kunstGalerie.length) % kunstGalerie.length;
+
+    const kunstwerk = kunstGalerie[aktuelleKunstIndex];
+
+    if (!kunstwerk) return;
+
+    // Original anzeigen
+    kunstModalOriginal.src = kunstwerk.bild;
+    kunstModalOriginal.alt = kunstwerk.name + " – Original";
+
+    // Fälschung anzeigen
+    if (kunstwerk.bildFake) {
+        kunstModalFake.src = kunstwerk.bildFake;
+        kunstModalFake.alt = kunstwerk.name + " – Fälschung";
+        kunstModalFake.parentElement.parentElement.style.display = "flex";
+    } else {
+        kunstModalFake.src = "";
+        kunstModalFake.alt = "";
+        kunstModalFake.parentElement.parentElement.style.display = "none";
+    }
+
+    // Name
+    kunstModalName.textContent = kunstwerk.name;
+
+    // Fälschungsgrund
+    if (kunstwerk.bildFake && kunstwerk.faelschung) {
+        kunstModalFaelschungText.textContent = kunstwerk.faelschung;
+        kunstModalFaelschung.style.display = "block";
+    } else {
+        kunstModalFaelschungText.textContent = "";
+        kunstModalFaelschung.style.display = "none";
+    }
+}
+
+function oeffneKunstGalerie(angeklicktesKunstwerk, angeklicktesBild) {
+    kunstGalerie = [];
+
+    daten
+        .filter(tier =>
+            tier.kategorie === "Kunst" &&
+            passtZuKunst(tier)
+        )
+        .forEach(kunst => {
+
+            if (!kunst.bild) return;
+
+            kunstGalerie.push({
+                name: kunst.name,
+                bild: kunst.bild,
+                bildFake: kunst.bildFake || "",
+                faelschung: kunst.faelschung || ""
+            });
+        });
+
+    const index = kunstGalerie.findIndex(
+        eintrag => eintrag.name === angeklicktesKunstwerk.name
+    );
+
+    if (index === -1) return;
+
+    zeigeKunstwerk(index);
+    kunstModal.classList.add("aktiv");
+}
+
+
+kunstZurueck.addEventListener("click", () => zeigeKunstwerk(aktuelleKunstIndex - 1));
+kunstWeiter.addEventListener("click", () => zeigeKunstwerk(aktuelleKunstIndex + 1));
+kunstModalSchliessen.addEventListener("click", () => kunstModal.classList.remove("aktiv"));
+kunstModal.addEventListener("click", event => {
+    if (event.target === kunstModal) kunstModal.classList.remove("aktiv");
+});
+
+document.addEventListener("keydown", event => {
+    if (!kunstModal.classList.contains("aktiv")) return;
+    if (event.key === "Escape") kunstModal.classList.remove("aktiv");
+    if (event.key === "ArrowLeft") zeigeKunstwerk(aktuelleKunstIndex - 1);
+    if (event.key === "ArrowRight") zeigeKunstwerk(aktuelleKunstIndex + 1);
+});
+
+let touchStartX = 0;
+kunstModal.addEventListener("touchstart", event => {
+    touchStartX = event.changedTouches[0].screenX;
+});
+kunstModal.addEventListener("touchend", event => {
+    const unterschied = event.changedTouches[0].screenX - touchStartX;
+    if (Math.abs(unterschied) < 50) return;
+    zeigeKunstwerk(aktuelleKunstIndex + (unterschied < 0 ? 1 : -1));
+});
+
+function aktualisiereFortschritt() {
+    const kategorienFortschritt = {
+        Fisch: "fischFortschritt",
+        Insekt: "insektFortschritt",
+        Meerestier: "meerFortschritt",
+        Kunst: "kunstFortschritt"
+    };
+
+    let gesamtGefangen = 0;
+    let gesamtTiere = 0;
+
+    Object.entries(kategorienFortschritt).forEach(([kategorie, elementId]) => {
+        const alle = daten.filter(tier => tier.kategorie === kategorie);
+        const gefangen = alle.filter(tierIstGefangen);
+        document.getElementById(elementId).textContent = `${gefangen.length} / ${alle.length}`;
+        gesamtGefangen += gefangen.length;
+        gesamtTiere += alle.length;
+    });
+
+    const prozent = gesamtTiere === 0 ? 0 : (gesamtGefangen / gesamtTiere) * 100;
+    document.getElementById("gesamtFortschritt").textContent = `${gesamtGefangen} / ${gesamtTiere} · ${prozent.toFixed(1)} %`;
+    document.getElementById("gesamtFortschrittBalken").style.width = `${prozent}%`;
+aktualisiereMeilensteine();
+}
+
+function aktualisiereMeilensteine() {
+    const meilensteine = {
+        Fisch: {
+            nameId: "meilensteinFischName",
+            textId: "meilensteinFischText",
+            abzeichenId: "meilensteinFischAbzeichen",
+            dateiPrefix: "fisch",
+            stufen: [
+                { ab: 0, bis: 10, name: "Angelanfänger" },
+                { ab: 10, bis: 20, name: "Fischkenner" },
+                { ab: 20, bis: 40, name: "Erfahrener Angler" },
+                { ab: 40, bis: 60, name: "Meisterangler" },
+                { ab: 60, bis: 80, name: "Fischprofi" },
+                { ab: 80, bis: 80, name: "Meister der Fische" }
+            ]
+        },
+
+        Insekt: {
+            nameId: "meilensteinInsektName",
+            textId: "meilensteinInsektText",
+            abzeichenId: "meilensteinInsektAbzeichen",
+            dateiPrefix: "insekt",
+            stufen: [
+                { ab: 0, bis: 10, name: "Käferneuling" },
+                { ab: 10, bis: 20, name: "Insektenkundiger" },
+                { ab: 20, bis: 40, name: "Insektenjäger" },
+                { ab: 40, bis: 60, name: "Insektenexperte" },
+                { ab: 60, bis: 80, name: "Insektenprofi" },
+                { ab: 80, bis: 80, name: "Meister der Insekten" }
+            ]
+        },
+
+        Meerestier: {
+            nameId: "meilensteinMeerName",
+            textId: "meilensteinMeerText",
+            abzeichenId: "meilensteinMeerAbzeichen",
+            dateiPrefix: "meer",
+            stufen: [
+                { ab: 0, bis: 5, name: "Schnorchelanfänger" },
+                { ab: 5, bis: 10, name: "Meeresforscher" },
+                { ab: 10, bis: 20, name: "Tiefseeforscher" },
+                { ab: 20, bis: 30, name: "Tiefseeexperte" },
+                { ab: 30, bis: 40, name: "Tiefseeprofi" },
+                { ab: 40, bis: 40, name: "Meister der Meere" }
+            ]
+        },
+
+        Kunst: {
+            nameId: "meilensteinKunstName",
+            textId: "meilensteinKunstText",
+            abzeichenId: "meilensteinKunstAbzeichen",
+            dateiPrefix: "kunst",
+            stufen: [
+                { ab: 0, bis: 5, name: "Kunstneuling" },
+                { ab: 5, bis: 10, name: "Kunstliebhaber" },
+                { ab: 10, bis: 20, name: "Kunstkenner" },
+                { ab: 20, bis: 30, name: "Kunstexperte" },
+                { ab: 30, bis: 43, name: "Kunstsammler" },
+                { ab: 43, bis: 43, name: "Meister der Kunst" }
+            ]
+        }
+    };
+
+    Object.entries(meilensteine).forEach(([kategorie, datenMeilenstein]) => {
+        const anzahl = daten.filter(tier =>
+            tier.kategorie === kategorie && tierIstGefangen(tier)
+        ).length;
+
+        let stufenIndex = 0;
+
+        for (let i = 0; i < datenMeilenstein.stufen.length; i++) {
+            if (anzahl >= datenMeilenstein.stufen[i].ab) {
+                stufenIndex = i;
+            }
+        }
+
+        const stufe = datenMeilenstein.stufen[stufenIndex];
+
+        document.getElementById(datenMeilenstein.nameId).textContent = stufe.name;
+
+        document.getElementById(datenMeilenstein.textId).textContent =
+            `${anzahl} / ${stufe.bis}`;
+
+        const abzeichenContainer =
+            document.getElementById(datenMeilenstein.abzeichenId);
+
+        abzeichenContainer.innerHTML = "";
+
+        for (let i = 0; i <= stufenIndex; i++) {
+
+    const abzeichenItem = document.createElement("div");
+    abzeichenItem.className = "meilenstein-abzeichen-item";
+
+    const stufenLabel = document.createElement("span");
+    stufenLabel.className = "meilenstein-abzeichen-stufe";
+    stufenLabel.textContent = `Stufe ${i + 1}`;
+
+    const abzeichen = document.createElement("img");
+
+    abzeichen.src =
+        `bilder/abzeichen/${datenMeilenstein.dateiPrefix}_stufe${i + 1}.png`;
+
+    abzeichen.alt =
+        `${datenMeilenstein.stufen[i].name} – Abzeichen Stufe ${i + 1}`;
+
+    abzeichen.title =
+        datenMeilenstein.stufen[i].name;
+
+    abzeichenItem.appendChild(stufenLabel);
+    abzeichenItem.appendChild(abzeichen);
+
+    abzeichenContainer.appendChild(abzeichenItem);
+}
+    });
+}
+
+const abzeichenModal = document.getElementById("abzeichen-modal");
+const abzeichenModalStufe = document.getElementById("abzeichen-modal-stufe");
+const abzeichenModalBild = document.getElementById("abzeichen-modal-bild");
+const abzeichenModalName = document.getElementById("abzeichen-modal-name");
+const abzeichenModalFortschritt = document.getElementById("abzeichen-modal-fortschritt");
+const abzeichenModalSchliessen = document.querySelector(".abzeichen-modal-schliessen");
+const abzeichenModalZurueck = document.getElementById("abzeichen-modal-zurueck");
+const abzeichenModalWeiter = document.getElementById("abzeichen-modal-weiter");
+
+let aktuelleAbzeichen = [];
+let aktuellesAbzeichenIndex = 0;
+
+function zeigeAbzeichenImModal(index) {
+    if (!aktuelleAbzeichen.length) return;
+
+    aktuellesAbzeichenIndex = index;
+
+    const abzeichen = aktuelleAbzeichen[aktuellesAbzeichenIndex];
+
+abzeichenModalStufe.textContent =
+    `Stufe ${aktuellesAbzeichenIndex + 1}`;
+
+abzeichenModalBild.src = abzeichen.src;
+    abzeichenModalBild.alt = abzeichen.alt;
+    abzeichenModalName.textContent = abzeichen.title;
+
+    abzeichenModalZurueck.style.display =
+        aktuellesAbzeichenIndex > 0 ? "flex" : "none";
+
+    abzeichenModalWeiter.style.display =
+        aktuellesAbzeichenIndex < aktuelleAbzeichen.length - 1
+            ? "flex"
+            : "none";
+}
+
+document.querySelectorAll(".meilenstein-abzeichen-liste").forEach(container => {
+    container.addEventListener("click", event => {
+
+        const geklicktesElement =
+            event.target.closest(".meilenstein-abzeichen-item");
+
+        if (!geklicktesElement) return;
+
+        const bilder = Array.from(
+            container.querySelectorAll(".meilenstein-abzeichen-item img")
+        );
+
+        aktuelleAbzeichen = bilder;
+
+        const geklicktesAbzeichen =
+            geklicktesElement.querySelector("img");
+
+        const index = bilder.indexOf(geklicktesAbzeichen);
+
+        zeigeAbzeichenImModal(index);
+
+        abzeichenModal.classList.add("aktiv");
+    });
+});
+
+abzeichenModalZurueck.addEventListener("click", () => {
+    if (aktuellesAbzeichenIndex > 0) {
+        zeigeAbzeichenImModal(aktuellesAbzeichenIndex - 1);
+    }
+});
+
+abzeichenModalWeiter.addEventListener("click", () => {
+    if (aktuellesAbzeichenIndex < aktuelleAbzeichen.length - 1) {
+        zeigeAbzeichenImModal(aktuellesAbzeichenIndex + 1);
+    }
+});
+
+abzeichenModalSchliessen.addEventListener("click", () => {
+    abzeichenModal.classList.remove("aktiv");
+});
+
+abzeichenModal.addEventListener("click", event => {
+    if (event.target === abzeichenModal) {
+        abzeichenModal.classList.remove("aktiv");
+    }
+});
+
+document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+        abzeichenModal.classList.remove("aktiv");
+    }
+});
+
+function markiereMonatAktiv() {
+    monate.forEach(monat => {
+        monat.classList.toggle("active", monat.dataset.month === String(ausgewaehlterMonat));
+    });
+}
+
+function markiereKategorieAktiv() {
+    kategorien.forEach(kategorie => {
+        const name = kategorie.querySelector("span").textContent.trim();
+        kategorie.classList.toggle("active", kategorienMap[name] === ausgewaehlteKategorie);
+    });
+}
+
+ladeGespeicherteFilter();
+
+preisInput.value = mindestpreis || "";
+sucheInput.value = suchtext;
+statusFilter.value = ausgewaehlterStatus;
+uhrzeitInput.value = ausgewaehlteUhrzeit;
+
+aktualisiereFundortFilter();
+markiereMonatAktiv();
+markiereKategorieAktiv();
+aktualisiereKunstBereiche();
+
+monate.forEach(monat => {
+    monat.addEventListener("click", () => {
+        ausgewaehlterMonat = monat.dataset.month === "alle" ? "alle" : Number(monat.dataset.month);
+        zeigeNeueDiesenMonat = false;
+        zeigeBaldWeg = false;
+        markiereMonatAktiv();
+        speichereFilter();
+        zeigeTiere();
+    });
+});
+
+kategorien.forEach(kategorie => {
+    kategorie.addEventListener("click", () => {
+        const name = kategorie.querySelector("span").textContent.trim();
+        ausgewaehlteKategorie = kategorienMap[name];
+        markiereKategorieAktiv();
+        aktualisiereFundortFilter();
+        aktualisiereKunstBereiche();
+        zeigeTiere();
+        speichereFilter();
+    });
+});
+
+preisInput.addEventListener("input", () => {
+    mindestpreis = Number(preisInput.value) || 0;
+    speichereFilter();
+    zeigeTiere();
+});
+
+statusFilter.addEventListener("change", () => {
+    ausgewaehlterStatus = statusFilter.value;
+    speichereFilter();
+    zeigeTiere();
+});
+
+fundortInput.addEventListener("change", () => {
+    ausgewaehlterFundort = fundortInput.value;
+    speichereFilter();
+    zeigeTiere();
+});
+
+sucheInput.addEventListener("input", () => {
+    suchtext = sucheInput.value;
+    speichereFilter();
+    zeigeTiere();
+});
+
+uhrzeitInput.addEventListener("change", () => {
+    ausgewaehlteUhrzeit = uhrzeitInput.value;
+    speichereFilter();
+    zeigeTiere();
+});
+
+kunstSucheInput.addEventListener("input", () => {
+    speichereFilter();
+    zeigeTiere();
+});
+kunstStatusInput.addEventListener("change", () => {
+    speichereFilter();
+    zeigeTiere();
+});
+kunstEchtheitInput.addEventListener("change", () => {
+    speichereFilter();
+    zeigeTiere();
+});
+kunstArtInput.addEventListener("change", () => {
+    speichereFilter();
+    zeigeTiere();
+});
+
+kunstFilterReset.addEventListener("click", () => {
+    kunstSucheInput.value = "";
+    kunstStatusInput.value = "alle";
+    kunstEchtheitInput.value = "alle";
+    kunstArtInput.value = "alle";
+    speichereFilter();
+    zeigeTiere();
+});
+
+document.getElementById("filterReset").addEventListener("click", () => {
+    ausgewaehlterMonat = new Date().getMonth() + 1;
+    ausgewaehlteUhrzeit = "aktuell";
+    zeigeNeueDiesenMonat = false;
+    zeigeBaldWeg = false;
+    markiereMonatAktiv();
+    uhrzeitInput.value = "aktuell";
+    speichereFilter();
+    zeigeTiere();
+});
+
+document.getElementById("neuDiesenMonat").addEventListener("click", () => {
+    ausgewaehlterMonat = new Date().getMonth() + 1;
+    zeigeNeueDiesenMonat = true;
+    zeigeBaldWeg = false;
+    markiereMonatAktiv();
+    zeigeTiere();
+});
+
+document.getElementById("baldWeg").addEventListener("click", () => {
+    ausgewaehlterMonat = new Date().getMonth() + 1;
+    zeigeBaldWeg = true;
+    zeigeNeueDiesenMonat = false;
+    markiereMonatAktiv();
+    zeigeTiere();
+});
+
+document.getElementById("filterResetNur").addEventListener("click", () => {
+    ausgewaehlterMonat = "alle";
+    ausgewaehlteKategorie = "Alle";
+    mindestpreis = 0;
+    ausgewaehlterFundort = "Alle";
+    ausgewaehlteUhrzeit = "";
+    suchtext = "";
+    ausgewaehlterStatus = "alle";
+    zeigeNeueDiesenMonat = false;
+    zeigeBaldWeg = false;
+
+    kunstSucheInput.value = "";
+    kunstStatusInput.value = "alle";
+    kunstEchtheitInput.value = "alle";
+    kunstArtInput.value = "alle";
+
+    preisInput.value = "";
+    sucheInput.value = "";
+    statusFilter.value = "alle";
+    uhrzeitInput.value = "";
+
+    markiereMonatAktiv();
+    markiereKategorieAktiv();
+    aktualisiereFundortFilter();
+    aktualisiereKunstBereiche();
+    speichereFilter();
+    zeigeTiere();
+});
+
+zeigeTiere();
+aktualisiereFortschritt();
+
+</script>
+<script>
+    if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+            navigator.serviceWorker.register("./service-worker.js")
+                .then(() => console.log("InselDex Offline-Modus aktiviert"))
+                .catch(error => console.error("Service Worker Fehler:", error));
+        });
+    }
+</script>
+
+</body>
+</html>
