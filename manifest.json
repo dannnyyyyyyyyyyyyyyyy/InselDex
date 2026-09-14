@@ -4,6 +4,7 @@
     "description": "Dein persönlicher Animal-Crossing-InselDex",
     "start_url": "./index.html",
     "display": "standalone",
+    "orientation": "landscape",
     "background_color": "#eef4e2",
     "theme_color": "#eef4e2",
     "lang": "de",
