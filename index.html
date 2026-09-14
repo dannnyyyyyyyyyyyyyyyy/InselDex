@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InselDex</title>
     <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DynaPuff:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -295,11 +298,12 @@ header img {
 
 .meilenstein-liste {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     gap: 12px;
 }
 
 .meilenstein {
+    width: 100%;
     min-height: 68px;
     padding: 12px 14px;
     border: 3px solid rgba(255, 255, 255, 0.9);
@@ -347,7 +351,8 @@ header img {
     justify-content: flex-end;
     gap: 8px;
     margin-left: auto;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
 }
 
 .meilenstein-abzeichen-item {
@@ -999,7 +1004,7 @@ header img {
     .filters { grid-template-columns: repeat(2, 1fr); }
     #kunstFilterBereich { grid-template-columns: repeat(2, 1fr); }
     .progress-stats { grid-template-columns: repeat(2, 1fr); }
-    .meilenstein-liste { grid-template-columns: repeat(2, 1fr); }
+    .meilenstein-liste { grid-template-columns: 1fr; }
     #resetBereich { grid-template-columns: repeat(2, 1fr); }
 }
 
@@ -1007,8 +1012,7 @@ header img {
     .container { padding: 15px; }
     .filters,
     #kunstFilterBereich { grid-template-columns: 1fr; }
-    .meilenstein-liste,
-    #resetBereich { grid-template-columns: 1fr; }
+    .meilenstein-liste { grid-template-columns: 1fr; }
 }
 
 /* Alle Bereichsüberschriften einheitlich */
@@ -1211,13 +1215,14 @@ header {
 }
 
 .bereichs-panel > summary {
+    position: relative;
     list-style: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 58px;
-    padding: 12px 18px;
+    padding: 12px 58px;
     background: rgba(255, 255, 255, 0.48);
     user-select: none;
 }
@@ -1228,11 +1233,14 @@ header {
 
 .bereichs-panel > summary::after {
     content: "＋";
-    margin-left: 12px;
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
     font-family: Arial, sans-serif;
-    font-size: 20px;
+    font-size: 24px;
+    line-height: 1;
     font-weight: bold;
-    transition: transform 0.2s ease;
 }
 
 .bereichs-panel[open] > summary::after {
@@ -1280,7 +1288,8 @@ header {
 }
 
 .filter-panel .filters {
-    margin-top: 16px;
+    width: min(1300px, calc(100% - 32px));
+    margin: 16px auto 25px;
 }
 
 .filter-panel #kunstResetBereich {
@@ -1290,7 +1299,7 @@ header {
 /* Alle Filter bleiben grundsätzlich in einer Zeile.
    Auf schmalen Displays darf die Leiste horizontal scrollen. */
 .filters {
-    grid-template-columns: repeat(5, minmax(130px, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     grid-auto-flow: column;
     overflow-x: auto;
     overflow-y: hidden;
@@ -1353,15 +1362,16 @@ header {
 
 /* Kurzbefehle: Hauptbutton + drei kleine Kategorien */
 #resetBereich {
+    width: min(1200px, 100%);
     display: grid !important;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 14px !important;
-    margin-top: 16px !important;
-    margin-bottom: 16px !important;
+    margin: 16px auto !important;
 }
 
 .quick-command {
     min-width: 0;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -1381,19 +1391,29 @@ header {
 
 .quick-category {
     min-width: 0;
-    height: 34px;
-    padding: 0;
-    border: 1px solid rgba(255, 255, 255, 0.95);
-    border-radius: 9px;
+    width: 42px;
+    height: 42px;
+    padding: 5px;
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
     background: white;
     cursor: pointer;
-    font-size: 18px;
     line-height: 1;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .quick-category:hover {
     transform: translateY(-1px);
+}
+
+.quick-category img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
 }
 
 .quick-fisch { background: #dceff6; }
@@ -1402,8 +1422,9 @@ header {
 
 .quick-reset {
     align-self: center;
+    justify-self: center;
     grid-column: 1 / -1;
-    max-width: 360px;
+    width: min(360px, 100%);
 }
 
 /* Karten: immer sauber zentriert und Text darf nie aus dem Rahmen laufen. */
@@ -1552,12 +1573,13 @@ header {
     }
 
     .quick-category-buttons {
-        width: 110px;
+        width: 140px;
     }
 
     .quick-category {
-        height: 28px;
-        font-size: 15px;
+        width: 38px;
+        height: 38px;
+        padding: 4px;
     }
 
     .card {
@@ -1592,71 +1614,11 @@ header {
     }
 }
 
-/* Fallback, falls ein Browser die Landscape-Ausrichtung der Web-App nicht erzwingt. */
-#portraitHinweis {
-    display: none;
-}
-
-@media (orientation: portrait) {
-    #portraitHinweis {
-        position: fixed;
-        inset: 0;
-        z-index: 20000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px;
-        background: #eef4e2;
-        background-image: url("blatt-muster-dezent.png");
-        text-align: center;
-    }
-
-    #portraitHinweis ~ header,
-    #portraitHinweis ~ .container,
-    #portraitHinweis ~ .kunst-modal,
-    #portraitHinweis ~ .abzeichen-modal {
-        display: none !important;
-    }
-
-    .portrait-hinweis-box {
-        width: min(420px, 90vw);
-        padding: 28px 22px;
-        border: 3px solid rgba(255, 255, 255, 0.95);
-        border-radius: 22px;
-        background: rgba(255, 255, 255, 0.86);
-        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.16);
-    }
-
-    .portrait-hinweis-icon {
-        font-size: 46px;
-        margin-bottom: 10px;
-    }
-
-    .portrait-hinweis-box h2 {
-        margin: 0 0 10px !important;
-        font-family: "DynaPuff", sans-serif;
-        font-size: 22px;
-        color: #26352b;
-    }
-
-    .portrait-hinweis-box p {
-        margin: 0;
-        font-size: 15px;
-        color: #4d604f;
-    }
-}
+/* Querformat wird über das Web-App-Manifest vorgegeben. */
 
     </style>
 </head>
 <body>
-
-<div id="portraitHinweis" aria-hidden="true">
-    <div class="portrait-hinweis-box">
-        <div class="portrait-hinweis-icon">↔️</div>
-        <h2>InselDex ist für Querformat optimiert</h2>
-        <p>Bitte drehe dein Gerät ins Querformat.</p>
-    </div>
-</div>
 
 <header>
     <img src="InselDex-Logo.png" alt="InselDex – Dein persönlicher Animal-Crossing-Begleiter">
@@ -1818,27 +1780,27 @@ header {
             <div class="quick-command">
                 <button id="filterReset" class="reset-button quick-main" type="button">🎯 Jetzt fangbar</button>
                 <div class="quick-category-buttons">
-                    <button class="quick-category quick-fisch" data-command="jetzt" data-kategorie="Fisch" type="button" title="Nur Fische">🐟</button>
-                    <button class="quick-category quick-insekt" data-command="jetzt" data-kategorie="Insekt" type="button" title="Nur Insekten">🐞</button>
-                    <button class="quick-category quick-meer" data-command="jetzt" data-kategorie="Meerestier" type="button" title="Nur Meerestiere">🦀</button>
+                    <button class="quick-category quick-fisch" data-command="jetzt" data-kategorie="Fisch" type="button" title="Nur Fische" aria-label="Nur Fische"><img src="bilder/icons/fisch.png" alt="Fische"></button>
+                    <button class="quick-category quick-insekt" data-command="jetzt" data-kategorie="Insekt" type="button" title="Nur Insekten" aria-label="Nur Insekten"><img src="bilder/icons/insekt.png" alt="Insekten"></button>
+                    <button class="quick-category quick-meer" data-command="jetzt" data-kategorie="Meerestier" type="button" title="Nur Meerestiere" aria-label="Nur Meerestiere"><img src="bilder/icons/meerestiere.png" alt="Meerestiere"></button>
                 </div>
             </div>
 
             <div class="quick-command">
                 <button id="neuDiesenMonat" class="reset-button quick-main" type="button">✨ Neu diesen Monat</button>
                 <div class="quick-category-buttons">
-                    <button class="quick-category quick-fisch" data-command="neu" data-kategorie="Fisch" type="button" title="Nur neue Fische">🐟</button>
-                    <button class="quick-category quick-insekt" data-command="neu" data-kategorie="Insekt" type="button" title="Nur neue Insekten">🐞</button>
-                    <button class="quick-category quick-meer" data-command="neu" data-kategorie="Meerestier" type="button" title="Nur neue Meerestiere">🦀</button>
+                    <button class="quick-category quick-fisch" data-command="neu" data-kategorie="Fisch" type="button" title="Nur neue Fische" aria-label="Nur neue Fische"><img src="bilder/icons/fisch.png" alt="Fische"></button>
+                    <button class="quick-category quick-insekt" data-command="neu" data-kategorie="Insekt" type="button" title="Nur neue Insekten" aria-label="Nur neue Insekten"><img src="bilder/icons/insekt.png" alt="Insekten"></button>
+                    <button class="quick-category quick-meer" data-command="neu" data-kategorie="Meerestier" type="button" title="Nur neue Meerestiere" aria-label="Nur neue Meerestiere"><img src="bilder/icons/meerestiere.png" alt="Meerestiere"></button>
                 </div>
             </div>
 
             <div class="quick-command">
                 <button id="baldWeg" class="reset-button quick-main" type="button">⚠️ Bald weg</button>
                 <div class="quick-category-buttons">
-                    <button class="quick-category quick-fisch" data-command="bald" data-kategorie="Fisch" type="button" title="Nur bald verschwindende Fische">🐟</button>
-                    <button class="quick-category quick-insekt" data-command="bald" data-kategorie="Insekt" type="button" title="Nur bald verschwindende Insekten">🐞</button>
-                    <button class="quick-category quick-meer" data-command="bald" data-kategorie="Meerestier" type="button" title="Nur bald verschwindende Meerestiere">🦀</button>
+                    <button class="quick-category quick-fisch" data-command="bald" data-kategorie="Fisch" type="button" title="Nur bald verschwindende Fische" aria-label="Nur bald verschwindende Fische"><img src="bilder/icons/fisch.png" alt="Fische"></button>
+                    <button class="quick-category quick-insekt" data-command="bald" data-kategorie="Insekt" type="button" title="Nur bald verschwindende Insekten" aria-label="Nur bald verschwindende Insekten"><img src="bilder/icons/insekt.png" alt="Insekten"></button>
+                    <button class="quick-category quick-meer" data-command="bald" data-kategorie="Meerestier" type="button" title="Nur bald verschwindende Meerestiere" aria-label="Nur bald verschwindende Meerestiere"><img src="bilder/icons/meerestiere.png" alt="Meerestiere"></button>
                 </div>
             </div>
 
