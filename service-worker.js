@@ -1,4 +1,4 @@
-const CACHE_NAME = "inseldex-v1";
+const CACHE_NAME = "inseldex-v2";
 
 const DATEIEN = [
     "./",
@@ -7,6 +7,7 @@ const DATEIEN = [
     "./manifest.json",
     "./icon-192.png",
     "./icon-512.png",
+    "./InselDex-Logo.png",
     "./blatt-muster-dezent.png"
 ];
 
@@ -16,6 +17,7 @@ self.addEventListener("install", event => {
             return cache.addAll(DATEIEN);
         })
     );
+    self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
@@ -26,7 +28,7 @@ self.addEventListener("activate", event => {
                     .filter(key => key !== CACHE_NAME)
                     .map(key => caches.delete(key))
             )
-        )
+        ).then(() => self.clients.claim())
     );
 });
 
