@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>InselDex</title>
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -2752,15 +2752,42 @@ document.getElementById("kunstWechselButton").addEventListener("click", () => {
     zeigeTiere();
 });
 
-// Querformat bevorzugen, sofern das Gerät/der Browser das Sperren unterstützt.
-// Auf iOS kann eine Website die physische Geräteausrichtung nicht zuverlässig erzwingen.
-function versucheQuerformat() {
-    if (screen.orientation && typeof screen.orientation.lock === "function") {
-        screen.orientation.lock("landscape").catch(() => {});
-    }
+// Querformat so früh und so oft wie möglich anfordern.
+// Das Manifest übernimmt den Startwunsch; die Screen Orientation API ist der zusätzliche
+// Versuch für Browser, die das Sperren in einer installierten Web-App unterstützen.
+async function versucheQuerformat() {
+    try {
+        if (!screen.orientation || typeof screen.orientation.lock !== "function") return false;
+
+        // Erst die allgemeine Landscape-Sperre versuchen, danach die beiden möglichen
+        // Landscape-Richtungen als Fallback. So bleibt 180°-Drehen möglich, Hochformat nicht.
+        for (const ausrichtung of ["landscape", "landscape-primary", "landscape-secondary"]) {
+            try {
+                await screen.orientation.lock(ausrichtung);
+                return true;
+            } catch (fehler) {
+                // iOS kann die Sperre ablehnen; dann wird die nächste Variante versucht.
+            }
+        }
+    } catch (fehler) {}
+    return false;
 }
 
-window.addEventListener("load", versucheQuerformat);
+function starteQuerformatVersuche() {
+    versucheQuerformat();
+    setTimeout(versucheQuerformat, 100);
+    setTimeout(versucheQuerformat, 500);
+    setTimeout(versucheQuerformat, 1500);
+}
+
+window.addEventListener("load", starteQuerformatVersuche);
+window.addEventListener("pageshow", starteQuerformatVersuche);
+document.addEventListener("visibilitychange", () => {
+    if (!document.hidden) versucheQuerformat();
+});
+window.addEventListener("orientationchange", () => {
+    setTimeout(versucheQuerformat, 50);
+});
 
 document.getElementById("tierWechselButton").addEventListener("click", () => {
     ausgewaehlteKategorie = "Alle";

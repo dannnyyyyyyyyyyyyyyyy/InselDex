@@ -1,4 +1,4 @@
-const CACHE_NAME = "inseldex-v4";
+const CACHE_NAME = "inseldex-v5";
 
 const DATEIEN = [
     "./",
