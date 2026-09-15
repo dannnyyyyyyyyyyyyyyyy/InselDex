@@ -1735,11 +1735,6 @@ header {
 
     </details>
 
-    <div class="kunst-wechsel-bereich">
-        <button id="kunstWechselButton" class="kunst-wechsel-button" type="button">🎨 Zu Kunst wechseln</button>
-        <button id="tierWechselButton" class="kunst-wechsel-button" type="button" style="display:none;">🐟 Zu Tieren wechseln</button>
-    </div>
-
     <details id="filterSektion" class="bereichs-panel filter-panel" open>
         <summary><h2 id="filterUeberschrift">🔎 Filter</h2></summary>
 
@@ -1810,6 +1805,10 @@ header {
 
     <details class="bereichs-panel uebersicht-panel" open>
         <summary><h2>📋 Übersicht</h2></summary>
+        <div class="kunst-wechsel-bereich">
+            <button id="kunstWechselButton" class="kunst-wechsel-button" type="button">🎨 Zu Kunst wechseln</button>
+            <button id="tierWechselButton" class="kunst-wechsel-button" type="button" style="display:none;">🐟 Zu Tieren wechseln</button>
+        </div>
         <div class="results" id="results"></div>
     </details>
 </div>
@@ -2299,7 +2298,20 @@ function passeKartennamenAn() {
 
 function zeigeTiere() {
     results.innerHTML = "";
-    const gefilterteTiere = daten.filter(tierPasst).sort((a, b) => a.name.localeCompare(b.name, "de"));
+    const gefilterteTiere = daten.filter(tierPasst).sort((a, b) => {
+        // Bei Tieren zuerst die noch nicht entdeckten Einträge, danach die entdeckten – jeweils A–Z.
+        // Kunst bleibt von dieser Status-Sortierung ausgenommen.
+        if (a.kategorie !== "Kunst" && b.kategorie !== "Kunst") {
+            const aGefangen = tierIstGefangen(a);
+            const bGefangen = tierIstGefangen(b);
+
+            if (aGefangen !== bGefangen) {
+                return aGefangen ? 1 : -1;
+            }
+        }
+
+        return a.name.localeCompare(b.name, "de");
+    });
 
     if (gefilterteTiere.length === 0) {
         results.innerHTML = `<div class="empty"><h3>Keine Einträge gefunden</h3><p>Für diese Auswahl gibt es momentan keine Tiere.</p></div>`;
@@ -2739,6 +2751,16 @@ document.getElementById("kunstWechselButton").addEventListener("click", () => {
     speichereFilter();
     zeigeTiere();
 });
+
+// Querformat bevorzugen, sofern das Gerät/der Browser das Sperren unterstützt.
+// Auf iOS kann eine Website die physische Geräteausrichtung nicht zuverlässig erzwingen.
+function versucheQuerformat() {
+    if (screen.orientation && typeof screen.orientation.lock === "function") {
+        screen.orientation.lock("landscape").catch(() => {});
+    }
+}
+
+window.addEventListener("load", versucheQuerformat);
 
 document.getElementById("tierWechselButton").addEventListener("click", () => {
     ausgewaehlteKategorie = "Alle";
