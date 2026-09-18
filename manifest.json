@@ -1,8 +1,10 @@
 {
     "name": "InselDex",
     "short_name": "InselDex",
+    "id": "./",
     "description": "Dein persönlicher Animal-Crossing-InselDex",
     "start_url": "./index.html",
+    "scope": "./",
     "display": "standalone",
     "orientation": "landscape",
     "background_color": "#eef4e2",
@@ -12,12 +14,14 @@
         {
             "src": "./icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "./icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }
